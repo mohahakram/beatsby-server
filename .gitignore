@@ -7,5 +7,10 @@ node_modules/
 # dotenv environment variables file
 .env
 
+#uploads
+uploadedBeats/
+
 #config
 .vscode
+
+Readme.md
