@@ -7,10 +7,12 @@ const bodyParser = require('body-parser')
 const cors = require('cors');
 var logger = require('morgan');
 const mongoose = require('mongoose');
-const connection = require('./config/dbConnection')
+const connection = require('./config/dbConnection');
 const passport = require('passport');
+const passportConfig = require("./config/passport")(passport);
 
 //*------------initialize stripe--------------
+
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 //*--------------GENERAL SETUP----------------
