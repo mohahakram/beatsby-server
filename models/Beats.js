@@ -3,6 +3,11 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const beatSchema = new Schema({
+    userId: {
+        type: String,
+        ref: "User",
+        required: true
+    },
     title: {
         type: String,
         required: true
@@ -15,7 +20,7 @@ const beatSchema = new Schema({
         type: String,
     },
     bpm: {
-        type: String,
+        type: Number,
         required: true
     },
     type: {
@@ -27,7 +32,7 @@ const beatSchema = new Schema({
         required: true
     },
     price: {
-        type: String,
+        type: Number,
         required: true
     },
     audioFile: {
