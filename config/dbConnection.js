@@ -1,7 +1,8 @@
 require('dotenv').config();
 const mongoose = require('mongoose')
 
-const uri = process.env.NODE_ENV === 'development' ? process.env.DB_URI : process.env.DB_ATLAS_URI;
+// check for environment to set the right db URI
+const uri = process.env.NODE_ENV === 'production' ? process.env.DB_ATLAS_URI : process.env.DB_URI
 
 const connection = mongoose
     .connect( uri,    
