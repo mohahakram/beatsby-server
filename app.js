@@ -9,22 +9,21 @@ var logger = require('morgan');
 const mongoose = require('mongoose');
 const connection = require('./config/dbConnection')
 const passport = require('passport');
-// const multer = require('multer');
-// var upload = require('./config/multer');
-// const routes = require('./routes');
+
+//*------------initialize stripe--------------
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 //*--------------GENERAL SETUP----------------
 
+//initialize app
 const app = express();
 app.use(express.urlencoded({
     extended: true
 }))
 app.use(express.json());
-// app.use(bodyParser.urlencoded({ extended: true }));
-// app.use(bodyParser.json());
 app.use(cookieParser());
+//nodemon log
 app.use(logger('dev'));
-
 
 // enable requests from different domains
 var corsOptions = {
@@ -34,13 +33,13 @@ var corsOptions = {
     optionSuccessStatus: 200
 }
 
+// cors settings to enable cross origin requests
 app.use(function(req, res, next) {
     res.set("Access-Control-Allow-Origin", req.header.origin);
     res.set("Access-Control-Allow-Credentials", 'true');
     res.set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
 });
-
 app.use(cors(corsOptions));
 
 //*--------------PASSPORT SETUP---------------------
@@ -50,32 +49,23 @@ app.use(passport.initialize());
 
 //*---------------MULTER SETUP----------------
 
-// definine as static file
+// define as static file
 app.use('/uploads', express.static('uploads'))
 
 //*------------------ROUTES-----------------------
 
+// redirect request to specific route
 app.use('/session', require('./routes/auth'));
-app.use('/beats', require('./routes/beats'));
+app.use('/beat', require('./routes/beat'));
+app.use('/play', require('./routes/play'));
 app.use('/playlist', require('./routes/playlist'));
+app.use('/favourite', passport.authenticate('jwt', {session: false}), require('./routes/favourite'));
+app.use('/dashboard', passport.authenticate('jwt', {session: false}), require('./routes/dashboard'));
+app.use('/cart', passport.authenticate('jwt', {session: false}), require('./routes/cart'));
+app.use('/checkout', passport.authenticate('jwt', {session: false}), require('./routes/checkout'));
 
-// app.use('/current', passport.authenticate('jwt', {session: false}), (req, res) => {
-//     res.send("success you can visit this page")
-// })
-app.use('/test', require('./routes/test'));
 //*------------------SERVER---------------------
 
 app.listen(process.env.PORT, () => {
     console.log(`Server running on port: ${process.env.PORT}`)
 }) 
-
-// server.use(
-//     cors({
-//       origin: [
-//         `${process.env.FRONT_URL}`,
-//         'http://localhost:3000',
-//         'https://mypage.com',
-//       ],
-//       credentials: true
-//     })
-//   );
