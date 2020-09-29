@@ -27,9 +27,11 @@ app.use(cookieParser());
 //nodemon log
 app.use(logger('dev'));
 
+let port = process.env.PORT || 4001
+
 // enable requests from different domains
 var corsOptions = {
-    origin: process.env.FRONTEND_URI,
+    origin: port,
     allowedHeaders: "Content-Type, Authorization, X-Requested-With",
     credentials: 'include',
     optionSuccessStatus: 200
@@ -37,7 +39,7 @@ var corsOptions = {
 
 // cors settings to enable cross origin requests
 app.use(function(req, res, next) {
-    res.set("Access-Control-Allow-Origin", req.header.origin);
+    res.set("Access-Control-Allow-Origin", port);
     res.set("Access-Control-Allow-Credentials", 'true');
     res.set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
@@ -68,7 +70,6 @@ app.use('/checkout', passport.authenticate('jwt', {session: false}), require('./
 
 //*------------------SERVER---------------------
 
-let port = process.env.PORT || 4001
 app.listen( port, () => {
     console.log(`Server running on port: ${port}`)
 }) 
