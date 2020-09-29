@@ -11,6 +11,9 @@ node_modules/
 uploadedBeats/
 
 #config
-.vscode
+.vscode/
+
+DS_STORE
 
 Readme.md
+
