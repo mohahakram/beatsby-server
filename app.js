@@ -27,13 +27,13 @@ app.use(cookieParser());
 //nodemon log
 app.use(logger('dev'));
 
-let port = process.env.PORT || 4001
+let port = process.env.FRONTEND_URI || 4001
 
 // enable requests from different domains
 var corsOptions = {
     origin: port,
     allowedHeaders: "Origin, Accept, Content-Type, Authorization, X-Requested-With",
-    // credentials: 'include',
+    credentials: 'include',
     optionSuccessStatus: 200
 }
 
