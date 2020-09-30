@@ -32,8 +32,8 @@ let port = process.env.PORT || 4001
 // enable requests from different domains
 var corsOptions = {
     origin: port,
-    allowedHeaders: "Content-Type, Authorization, X-Requested-With",
-    credentials: 'include',
+    allowedHeaders: "Origin, Accept, Content-Type, Authorization, X-Requested-With",
+    // credentials: 'include',
     optionSuccessStatus: 200
 }
 
