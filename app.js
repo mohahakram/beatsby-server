@@ -28,10 +28,11 @@ app.use(cookieParser());
 app.use(logger('dev'));
 
 let port = process.env.PORT || 4001
+let frontend_uri = process.env.NODE_ENV === "production" ? process.env.FRONTEND_URI : "http://localhost:3000"
 
 // enable requests from different domains
 var corsOptions = {
-    origin: process.env.FRONTEND_URI,
+    origin: frontend_uri,
     allowedHeaders: "Origin, Accept, Content-Type, Authorization, X-Requested-With",
     credentials: 'include',
     optionSuccessStatus: 200
@@ -39,7 +40,7 @@ var corsOptions = {
 
 // cors settings to enable cross origin requests
 app.use(function(req, res, next) {
-    res.set("Access-Control-Allow-Origin", process.env.FRONTEND_URI);
+    res.set("Access-Control-Allow-Origin", frontend_uri);
     res.set("Access-Control-Allow-Credentials", 'true');
     res.set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
