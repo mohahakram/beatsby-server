@@ -8,7 +8,9 @@ const connection = mongoose
     .connect( uri,    
         {useNewUrlParser: true,
         useCreateIndex: true,
-        useUnifiedTopology: true})
+        useUnifiedTopology: true,
+        useFindAndModify: false
+    })
     .then( dbConnectionResult => {
         console.log(`Connected to Mongo! Database name: ${dbConnectionResult.connections[0].name}`)
     })
