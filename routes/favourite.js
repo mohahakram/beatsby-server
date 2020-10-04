@@ -4,12 +4,22 @@ const mongoose = require("mongoose");
 const User = require("../models/Users");
 const Favourite = require("../models/Favourites");
 
+// * get favourites of specific user
 router.get("/", (req, res) => {
-    Favourite.findOne({ userId: { $eq: req.user.id } })
-    // .populate('favouriteList')
-    .then((dbRes) => {
-        console.log(req.user.id)
-        res.status(200).json(dbRes);
+    // deconstruc from req object to access variables globaly
+    const { user, params } = req;
+    //find user favourites depending on user id
+    Favourite.findOne({ userId: { $eq: user.id } })
+    // fetch from Beat collection and populate with matching ids
+    .populate('favouriteList')
+    .then((list) => {
+        //check if user user already has a cart in db
+        if (!list) {
+            res.status(400).json({message: "no favourites"});
+            
+        } else {
+            res.status(200).send(list) 
+        }
     }).catch((err) => console.log(err))
 });
 
@@ -32,10 +42,9 @@ router.post("/add/:id", (req, res) => {
                 try {
                     const savedFavourite = await newFavourite.save()
                     .then( dbRes =>
-                        User.updateOne({_id: user.id}, {$push: {favourites: dbRes._id}}, {new: true})
+                        User.findOneAndUpdate({_id: user.id}, {favourites: dbRes.id}, {upsert: true}),
+                        res.status(200).json({status:"ok", message:"added to favourites"})
                     )
-                    console.log(savedFavourite);
-                    res.status(200).json({status:"ok", message:"added to favourites"});
                 } catch (err) {
                     res.status(400).send(err);
                 }
@@ -51,7 +60,6 @@ router.post("/add/:id", (req, res) => {
                 } else {
                     updatedList.push(params.id);
                 }
-                // console.log(updatedList);
 
                 //update db with updated array
                 Favourite.updateOne(
@@ -62,13 +70,12 @@ router.post("/add/:id", (req, res) => {
                         },
                     }
                 )
-                .then((res) => {
-                    console.log(res);
+                .then((dbRes) => {
+                    res.status(200).json({status:"ok", message: "added to favourites" });
                 })
                 .catch((err) => {
                     console.log(err);
                 });
-                res.status(200).json({status:"ok", message: "added to favourites" });
             }
         })
         .catch((err) => console.log(err));
@@ -81,12 +88,11 @@ router.post('/delete/:id', (req, res) => {
     Favourite.findOneAndUpdate(
         {userId: user.id},
         {$pull: {'favouriteList': params.id}}, {new: true}
-    ).then( res =>
-        console.log(res)
+    ).then( dbRes =>
+        res.status(200).json({status:"ok", message:"deleted from cart"})
     ).catch( err =>
         console.log(err))
             
-    res.status(200).json({status:"ok", message:"deleted from cart"})
 })
 
 module.exports = router;
