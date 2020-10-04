@@ -60,7 +60,7 @@ router.post("/upload", upload.single('audioFile'), async (req, res) => {
             userId: userId,
             title: title,
             artist: artist,
-            featureArtist: featureArtist,
+            featureArtist: featureArtist != 'undefined' ?  featureArtist : "",
             bpm: bpm,
             type: type,
             contract: contract,
