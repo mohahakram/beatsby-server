@@ -87,9 +87,9 @@ router.post('/login', (req, res, next) => {
 
                 //! SET SECURE TO TRUE (HTTPS) IN OBJECT FOR PRODUCTION MODE / HTTP ONLY SHOULD BE TRUE
                 //send back token in expiring cookie
-                const cookie = res.cookie("auth_token", token, { httpOnly: true, secure: secureCookie, expires: date, sameSite: 'None'})
-                res.status(200).json({id: user.id, userName: user.userName})
-	            res.end()
+                // const cookie = res.cookie("auth_token", token, { httpOnly: true, secure: secureCookie, expires: date, sameSite: 'None'})
+                res.status(200).json({id: user.id, userName: user.userName, jwt: token})
+                // res.end()
             } else {
                 //if passwords dont match send back error message
                 return res.status(400).json({
