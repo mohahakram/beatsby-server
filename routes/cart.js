@@ -19,8 +19,10 @@ router.get('/', (req, res) => {
             //check if user user already has a cart in db
             if (!list) {
                 res.status(400).json({message: "cart is empty"});
+                
+            } else {
+                res.status(200).send(list) 
             }
-            res.status(200).send(list) 
     })
 })
 
@@ -44,10 +46,10 @@ router.post("/add/:id", (req, res) => {
                 try {
                     const savedCart = await newCart.save()
                     .then( dbRes =>
-                        User.create({_id: user.id}, {cart: dbRes.id}, {new: true})
+                        User.findByIdAndUpdate({_id: user.id}, {cart: dbRes.id}, {upsert: true}),
+                        res.status(200).json({message: "added to cart"})
                     )
                     
-                    res.status(200).send("cart added");
                 } catch (err) {
                     res.status(400).send(err);
                 }
@@ -59,9 +61,9 @@ router.post("/add/:id", (req, res) => {
                 updatedList = [...dbResList];
 
                 if ( dbResList.find((item) => item.id === params.id) !== undefined ) {
-                    return res.status(400).json({status:"error", message: "already in cart" });
+                    // return res.status(400).json({status:"error", message: "already in cart" });
                 // or if (dbResList.some( item => item.id === params.id)) {
-                // return res.status(400).json({ message: "already in cart" });
+                return res.status(400).json({ message: "already in cart" });
 
                 } else {
                     updatedList.push(params.id);
@@ -76,13 +78,12 @@ router.post("/add/:id", (req, res) => {
                         },
                     }
                 )
-                .then((res) => {
-                    console.log(res);
+                .then((dbRes) => {
+                    res.status(200).json({ status:"ok", message: "added to cart" });
                 })
                 .catch((err) => {
                     console.log(err);
                 });
-                res.status(200).json({ status:"ok", message: "added to cart" });
             }
         })
         .catch((err) => console.log(err));
@@ -95,13 +96,13 @@ router.post('/delete/:id', (req, res) => {
 
     Cart.findOneAndUpdate(
         {userId: user.id},
-        {$pull: {'cartList': params.id}}, {new: true}
-    ).then( res =>
-        console.log(res)
+        {$pull: {'cartList': params.id}}, {upsert: true}
+    ).then( dbRes =>
+        res.status(200).json({message: "deleted from cart"})
     ).catch( err =>
         console.log(err))
             
-    res.status(200).json({status:"ok", message:"deleted from cart"})
+    // res.status(200).json({status:"ok", message:"deleted from cart"})
 })
 
 module.exports = router;
