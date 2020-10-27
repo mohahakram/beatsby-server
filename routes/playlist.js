@@ -6,14 +6,22 @@ const Beat = require('../models/Beats');
 router.get('/:id', function(req, res, next) {
     // replace any '-' to space as types in db dont have '-' character
     const type = req.params.id.replace('-',' ')
-    Beat
-        .find( { type: { $eq: type } } )
-        .then( dbRes => {
-            res.status(200).json(dbRes)
-            console.log(dbRes)
-        })
-        .catch(  err => console.log(err))
+    if ( type === "exclusive" || type === "lease") {
+        Beat.find( { contract: { $eq: type } } )
+            .then( dbRes => {
+                res.status(200).json(dbRes)
+            })
+            .catch( err => console.log(err))
+    } else {
+        Beat
+            .find( { type: { $eq: type } } )
+            .then( dbRes => {
+                res.status(200).json(dbRes)
+            })
+            .catch(  err => console.log(err))
+    }
 })
+
 
 //* get all songs from specific artist
 router.get('/artist/:id', (req, res) => {

@@ -40,50 +40,67 @@ router.post("/upload", upload.single('audioFile'), async (req, res) => {
         body: { userId, title, artist, featureArtist, bpm, type, contract, price }
     } = req;
 
-    //! check for file type
-    // if (audioFile.detectedFileExtension != ".wav" || audioFile.detectedFileExtension != ".mp3") {
-    //     res.status(400).send('Invalid format. Please upload only . wav or .mp3 files');
-    // } else if (audioFile.size > 70000000){
-    //     res.status(400).send('Maximum file size is 70Mb')
-    // }
-    
-    // create file name with variables passed in and saving to directory
-    const fileName = new Date().toISOString() + artist + ' - ' + title + file.detectedFileExtension;
-    const path = await pipeline(
-        file.stream,
-        fs.createWriteStream(`./uploadedBeats/${fileName}`)
-    );
+    //! check for file type and size
+    if (file.detectedFileExtension != ".wav") {
+        res.status(400).json({   status: "error", 
+                                    type: "file type", 
+                                    msg: "Invalid file format. Please upload only . wav or .mp3 file"});
+    } else if (file.size > 70000000){
+        res.status(400).json({  status: "error", 
+                                type:"file size", 
+                                message:"Maximum file size is 70Mb"})
+    } else {
+        // create file name with variables passed in and saving to directory
+        const fileName = new Date().toISOString() + artist + ' - ' + title + file.detectedFileExtension;
+        const path = await pipeline(
+            file.stream,
+            fs.createWriteStream(`./uploadedBeats/${fileName}`)
+            );
+        
+        // create new Beat object and poplulate with received variables
+        try {
+            const newBeat = new Beat({
+                userId: userId,
+                title: title,
+                artist: artist,
+                featureArtist: featureArtist != 'undefined' ?  featureArtist : "",
+                bpm: bpm,
+                type: type,
+                contract: contract,
+                price: price,
+                audioFile: {
+                    fileName: fileName,
+                    path: './uploadedBeats/'+fileName,
+                    originalName: file.originalName,
+                    mimeType: file.detectedMimeType,
+                    size: file.size
+                }
+            });
 
-    // create new Beat object and poplulate with received variables
-    try {
-        const newBeat = new Beat({
-            userId: userId,
-            title: title,
-            artist: artist,
-            featureArtist: featureArtist != 'undefined' ?  featureArtist : "",
-            bpm: bpm,
-            type: type,
-            contract: contract,
-            price: price,
-            audioFile: {
-                fileName: fileName,
-                path: './uploadedBeats/'+fileName,
-                originalName: file.originalName,
-                mimeType: file.detectedMimeType,
-                size: file.size
-            }
-        });
-
-        // write the object in database
-        let savedBeat = await newBeat.save()
-        .then(dbRes => 
-            User.updateOne({_id: userId}, { $push: {beats: dbRes.id} })    
-        ).catch((err) => {
-            console.log(err)
-        })
-        res.status(200).json({ data: savedBeat });
-    } catch (err) {
-        res.status(500).json({ error: err });
+            // write the object in database
+            let savedBeat = await newBeat.save()
+            .then(dbRes => 
+                User.updateOne({_id: userId}, { $push: {beats: dbRes.id} })    
+            )
+            .then( dbRes => res.status(200).json({
+                status: "success",
+                type: "upload",
+                msg: "uploaded succesfully"}))
+            .catch((err) => {
+                res.status(400).json({
+                    status: "error",
+                    type: "upload",
+                    msg: "Couldn't upload. Please try again later"
+                });
+            })
+        } catch (err) {
+            res.status(500).json({
+                status: "error",
+                type: "upload",
+                msg: "something went wrong, please try again later"
+            });
+            console.log(err);
+        }
     }
 
 });
