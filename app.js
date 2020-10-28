@@ -39,12 +39,12 @@ var corsOptions = {
 }
 
 // cors settings to enable cross origin requests
-// app.use(function(req, res, next) {
-//     res.set("Access-Control-Allow-Origin", frontend_uri);
-//     res.set("Access-Control-Allow-Credentials", 'true');
-//     res.set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-//     next();
-// });
+app.use(function(req, res, next) {
+    res.set("Access-Control-Allow-Origin", frontend_uri);
+    // res.set("Access-Control-Allow-Credentials", 'true');
+    // res.set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
 app.use(cors(corsOptions));
 
 //*--------------PASSPORT SETUP---------------------
