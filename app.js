@@ -34,7 +34,7 @@ let frontend_uri = process.env.NODE_ENV === "production" ? process.env.FRONTEND_
 var corsOptions = {
     origin: frontend_uri,
     allowedHeaders: "Origin, Accept, Content-Type, Authorization, X-Requested-With",
-    credentials: 'include',
+    credentials: 'true',
     optionSuccessStatus: 200
 }
 
